@@ -153,3 +153,4 @@ C:\Users\saba\source\repos\apitesthost\apitesthost\obj\Debug\netcoreapp3.1\apite
 C:\Users\saba\source\repos\apitesthost\apitesthost\obj\Debug\netcoreapp3.1\apitesthost.csproj.CoreCompileInputs.cache
 C:\Users\saba\source\repos\apitesthost\apitesthost\obj\Debug\netcoreapp3.1\apitesthost.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\saba\source\repos\apitesthost\apitesthost\obj\Debug\netcoreapp3.1\apitesthost.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\saba\source\repos\apitesthost\apitesthost\bin\Debug\netcoreapp3.1\app.json

@@ -64,6 +64,15 @@ namespace apitesthost.Controllers
             complete.iscompleted = _context.users.Where(x => x.ID == id).FirstOrDefault().iscomplete;
             return complete;
         }
+        [HttpGet]
+        [Route("isusercomplete2/{id}")]
+        public async Task<ActionResult<isprofilecompletedmodel>> UsersComplete2(int id)
+        {
+            var complete = new isprofilecompletedmodel();
+            complete.iscompleted = _context.users.Where(x => x.ID == id).FirstOrDefault().iscomplete;
+            return complete;
+        }
+
 
         [HttpPost]
         [Route("signUp")]
