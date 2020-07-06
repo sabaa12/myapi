@@ -9,7 +9,7 @@ namespace apitesthost.Models.finalproject.CompleteProfile
     {
         public string user_name { get; set; }
         public string email_address { get; set; }
-        public int age { get; set; }
+        public string age { get; set; }
         public string gender { get; set; }
         public string position { get; set; }
         public List<string> skills { get; set; }

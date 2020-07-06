@@ -41,7 +41,7 @@ namespace apitesthost.Controllers
             model.user_name = compmodel.user_name;
             model.email_address = compmodel.email_address;
             model.gender = compmodel.gender;
-            model.age = compmodel.age;
+            model.age  = compmodel.age.ToString();
             model.position = _context.developer.Where(x => x.ID == id).FirstOrDefault().position;
             var role = _context.users.Where(x => x.ID == id).FirstOrDefault().role;
             if (role == 1) model.role = "Developer";
@@ -64,16 +64,7 @@ namespace apitesthost.Controllers
             complete.iscompleted = _context.users.Where(x => x.ID == id).FirstOrDefault().iscomplete;
             return complete;
         }
-        [HttpGet]
-        [Route("isusercomplete2/{id}")]
-        public async Task<ActionResult<isprofilecompletedmodel>> UsersComplete2(int id)
-        {
-            var complete = new isprofilecompletedmodel();
-            complete.iscompleted = _context.users.Where(x => x.ID == id).FirstOrDefault().iscomplete;
-            return complete;
-        }
-
-
+        
         [HttpPost]
         [Route("signUp")]
         public async Task<ActionResult<signUpreturnvalues>> signUp([FromForm]userModel user)
@@ -140,7 +131,7 @@ namespace apitesthost.Controllers
             model.user_name = complete.user_name;
             model.email_address = complete.email_address;
             model.gender = complete.gender;
-            model.age = complete.age;
+            model.age = Int32.Parse(complete.age);
             model.ID = userID;
             model.photo_url = complete.photo_url;
             _context.complete_profile.Add(model);
