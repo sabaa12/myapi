@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using apitesthost.Models.finalproject;
 using apitesthost.Models.finalproject.CompleteProfile;
 using Microsoft.Extensions.DependencyModel;
+using Newtonsoft.Json.Linq;
 
 namespace apitesthost.Controllers
 {
@@ -120,13 +121,64 @@ namespace apitesthost.Controllers
             return NotFound(ret);
         }
 
+        //[HttpPost]
+        //[Route("CompleteProfile")]
+        //public async Task<ActionResult<completereturnvalue>> CompleteProfile([FromBody] compteteprofilepost complete)
+        //{
+        //    var model = new complete_profile();
+        //    var developermodel = new developer();
+
+        //    var userID = _context.users.Where(x => x.email_address == complete.email_address).FirstOrDefault().ID;
+        //    model.user_name = complete.user_name;
+        //    model.email_address = complete.email_address;
+        //    model.gender = complete.gender;
+        //    model.age = Int32.Parse(complete.age);
+        //    model.ID = userID;
+        //    model.photo_url = complete.photo_url;
+        //    _context.complete_profile.Add(model);
+
+        //    developermodel.ID = userID;
+        //    developermodel.position = complete.position;
+
+        //    _context.developer.Add(developermodel);
+        //    foreach (var item in complete.skills)
+        //    {
+        //        var skillmodel = new skkils();
+        //        skillmodel.developerID = userID;
+        //        skillmodel.skill = item;
+        //        _context.skkils.Add(skillmodel);
+        //    }
+        //    await _context.SaveChangesAsync();
+
+        //    _context.users.Where(x => x.email_address == complete.email_address).FirstOrDefault().iscomplete = true;
+        //    var ret = new completereturnvalue();
+        //    ret.profile_completed = true; 
+        //    await _context.SaveChangesAsync();
+
+        //    return ret;
+        //}
+
         [HttpPost]
         [Route("CompleteProfile")]
-        public async Task<ActionResult<completereturnvalue>> CompleteProfile([FromBody] compteteprofilepost complete)
+        public async Task<ActionResult<completereturnvalue>> CompleteProfile([FromForm] getjsnoasstring complete1)
         {
+            var complete = Newtonsoft.Json.JsonConvert.DeserializeObject<compteteprofilepost>(complete1.json);
+
             var model = new complete_profile();
             var developermodel = new developer();
-
+            var email = _context.users.Where(x => x.email_address == complete.email_address).FirstOrDefault();
+            if ( email == null)
+            {
+                var error = new errormodel();
+                error.error = "user with this email doesnot exisit";
+                return NotFound(error);
+            }
+            else if(_context.users.Where(x => x.email_address == complete.email_address).FirstOrDefault().iscomplete)
+            {
+                var error = new errormodel();
+                error.error = "This account  is allready completed";
+                return Unauthorized(error);
+            }
             var userID = _context.users.Where(x => x.email_address == complete.email_address).FirstOrDefault().ID;
             model.user_name = complete.user_name;
             model.email_address = complete.email_address;
@@ -151,7 +203,7 @@ namespace apitesthost.Controllers
 
             _context.users.Where(x => x.email_address == complete.email_address).FirstOrDefault().iscomplete = true;
             var ret = new completereturnvalue();
-            ret.profile_completed = true; 
+            ret.profile_completed = true;
             await _context.SaveChangesAsync();
 
             return ret;
