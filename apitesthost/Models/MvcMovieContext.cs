@@ -19,5 +19,8 @@ namespace apitesthost.Models
         public DbSet<complete_profile> complete_profile { get; set; }
         public DbSet<developer> developer { get; set; }
         public DbSet<skkils> skkils { get; set; }
+        public DbSet<employer_company> employer_company { get; set; }
+ 
+
     }
 }

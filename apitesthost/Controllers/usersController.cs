@@ -31,12 +31,15 @@ namespace apitesthost.Controllers
         [Route("Users/{id}")]
         public async Task<ActionResult<compteteprofilepost>> GetUsers(int id)
         {
+            var role = _context.users.Where(x => x.ID == id).FirstOrDefault().role;
+
             if (!_context.users.Where(x => x.ID == id).FirstOrDefault().iscomplete)
             {
                 var error = new errormodel();
                 error.error = "profile is not completed";
                 return NotFound(error);
             }
+            
             var model = new compteteprofilepost();
             var compmodel = _context.complete_profile.Where(x => x.ID == id).FirstOrDefault();
             model.user_name = compmodel.user_name;
@@ -44,7 +47,7 @@ namespace apitesthost.Controllers
             model.gender = compmodel.gender;
             model.age  = compmodel.age.ToString();
             model.position = _context.developer.Where(x => x.ID == id).FirstOrDefault().position;
-            var role = _context.users.Where(x => x.ID == id).FirstOrDefault().role;
+            
             if (role == 1) model.role = "Developer";
             var skills = _context.skkils.Where(x => x.developerID == id).ToList();
             var list = new List<string>();
@@ -53,6 +56,45 @@ namespace apitesthost.Controllers
                 list.Add(item.skill.Trim());
             }
             model.skills = list;
+            return model;
+        }
+
+        [HttpGet]
+        [Route("GeEmploertUsers/{id}")]
+        public async Task<ActionResult<emploergetmodel>> GeEmploertUsers(int id)
+        {
+            var role = _context.users.Where(x => x.ID == id).FirstOrDefault().role;
+            if (role != 2)
+            {
+                var error = new errormodel();
+                error.error = "this user is not emploer";
+                return NotFound(error);
+
+            }
+            if (!_context.users.Where(x => x.ID == id).FirstOrDefault().iscomplete)
+            {
+                var error = new errormodel();
+                error.error = "profile is not completed";
+                return NotFound(error);
+            }
+
+            var model = new emploergetmodel();
+            var compmodel = _context.complete_profile.Where(x => x.ID == id).FirstOrDefault();
+            var comanymodel = _context.employer_company.Where(x => x.ID == id).FirstOrDefault();
+            model.user_name = compmodel.user_name;
+            model.email_address = compmodel.email_address;
+            model.gender = compmodel.gender;
+            model.age = compmodel.age;
+            model.photo_url = compmodel.photo_url;
+            if (comanymodel != null)
+            {
+                model.company_logo = comanymodel.company_logo;
+                model.company_name = comanymodel.company_name;
+            }
+            
+           
+             
+            
             return model;
         }
 
@@ -121,45 +163,9 @@ namespace apitesthost.Controllers
             return NotFound(ret);
         }
 
-        //[HttpPost]
-        //[Route("CompleteProfile")]
-        //public async Task<ActionResult<completereturnvalue>> CompleteProfile([FromBody] compteteprofilepost complete)
-        //{
-        //    var model = new complete_profile();
-        //    var developermodel = new developer();
-
-        //    var userID = _context.users.Where(x => x.email_address == complete.email_address).FirstOrDefault().ID;
-        //    model.user_name = complete.user_name;
-        //    model.email_address = complete.email_address;
-        //    model.gender = complete.gender;
-        //    model.age = Int32.Parse(complete.age);
-        //    model.ID = userID;
-        //    model.photo_url = complete.photo_url;
-        //    _context.complete_profile.Add(model);
-
-        //    developermodel.ID = userID;
-        //    developermodel.position = complete.position;
-
-        //    _context.developer.Add(developermodel);
-        //    foreach (var item in complete.skills)
-        //    {
-        //        var skillmodel = new skkils();
-        //        skillmodel.developerID = userID;
-        //        skillmodel.skill = item;
-        //        _context.skkils.Add(skillmodel);
-        //    }
-        //    await _context.SaveChangesAsync();
-
-        //    _context.users.Where(x => x.email_address == complete.email_address).FirstOrDefault().iscomplete = true;
-        //    var ret = new completereturnvalue();
-        //    ret.profile_completed = true; 
-        //    await _context.SaveChangesAsync();
-
-        //    return ret;
-        //}
-
+         
         [HttpPost]
-        [Route("CompleteProfile")]
+        [Route("СompleteProfileDeveloper ")]
         public async Task<ActionResult<completereturnvalue>> CompleteProfile([FromForm] getjsnoasstring complete1)
         {
             var complete = Newtonsoft.Json.JsonConvert.DeserializeObject<compteteprofilepost>(complete1.json);
@@ -209,7 +215,42 @@ namespace apitesthost.Controllers
             return ret;
         }
 
-    }
 
-      
+
+        [HttpPost]
+        [Route("СompleteProfileEmployer")]
+        public async Task<ActionResult<completereturnvalue>> CompleteProfile_empleyers([FromForm] employersModel complete1)
+        {
+            var perosnmodel = new complete_profile();
+            var userID = _context.users.Where(x => x.email_address == complete1.email_address).FirstOrDefault().ID;
+            var companymodel = new employer_company();
+
+            perosnmodel.ID = userID;
+            perosnmodel.photo_url = complete1.photo_url;
+            perosnmodel.user_name = complete1.user_name;
+            perosnmodel.email_address = complete1.email_address;
+            perosnmodel.gender = complete1.gender;
+            perosnmodel.age = Int32.Parse(complete1.age);
+           
+
+           _context.complete_profile.Add(perosnmodel);
+          
+            if(complete1.employer_type.ToLower() == "company")
+            {
+                companymodel.ID = userID;
+                companymodel.company_name = complete1.company_name;
+                companymodel.company_logo = complete1.company_logo;
+
+                _context.employer_company.Add(companymodel);
+            
+            }
+          
+            var ret = new completereturnvalue();
+            _context.users.Where(x => x.email_address == complete1.email_address).FirstOrDefault().iscomplete = true;
+            ret.profile_completed = true;
+            await _context.SaveChangesAsync();
+            return ret ;
+        }
+
+    }  
 }
