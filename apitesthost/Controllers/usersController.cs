@@ -47,7 +47,7 @@ namespace apitesthost.Controllers
             model.gender = compmodel.gender;
             model.age  = compmodel.age.ToString();
             model.position = _context.developer.Where(x => x.ID == id).FirstOrDefault().position;
-            
+            model.photo_url = compmodel.photo_url;
             if (role == 1) model.role = "Developer";
             var skills = _context.skkils.Where(x => x.developerID == id).ToList();
             var list = new List<string>();
@@ -165,8 +165,8 @@ namespace apitesthost.Controllers
 
          
         [HttpPost]
-        [Route("СompleteProfileDeveloper ")]
-        public async Task<ActionResult<completereturnvalue>> CompleteProfile([FromForm] getjsnoasstring complete1)
+        [Route("СompleteProfileDeveloper")]
+        public async Task<ActionResult<completereturnvalue>> СompleteProfileDeveloper([FromForm] getjsnoasstring complete1)
         {
             var complete = Newtonsoft.Json.JsonConvert.DeserializeObject<compteteprofilepost>(complete1.json);
 
@@ -222,7 +222,14 @@ namespace apitesthost.Controllers
         public async Task<ActionResult<completereturnvalue>> CompleteProfile_empleyers([FromForm] employersModel complete1)
         {
             var perosnmodel = new complete_profile();
+            if (_context.users.Where(x => x.email_address == complete1.email_address).FirstOrDefault() == null)
+            {
+                var error = new errormodel();
+                error.error = "user with this email doesnot exisit";
+                return NotFound(error);
+            }
             var userID = _context.users.Where(x => x.email_address == complete1.email_address).FirstOrDefault().ID;
+       
             var companymodel = new employer_company();
 
             perosnmodel.ID = userID;
@@ -233,10 +240,12 @@ namespace apitesthost.Controllers
             perosnmodel.age = Int32.Parse(complete1.age);
            
 
-           _context.complete_profile.Add(perosnmodel);
+
           
             if(complete1.employer_type.ToLower() == "company")
             {
+              
+                perosnmodel.user_name = null;
                 companymodel.ID = userID;
                 companymodel.company_name = complete1.company_name;
                 companymodel.company_logo = complete1.company_logo;
@@ -244,7 +253,8 @@ namespace apitesthost.Controllers
                 _context.employer_company.Add(companymodel);
             
             }
-          
+            _context.complete_profile.Add(perosnmodel);
+
             var ret = new completereturnvalue();
             _context.users.Where(x => x.email_address == complete1.email_address).FirstOrDefault().iscomplete = true;
             ret.profile_completed = true;
