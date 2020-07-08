@@ -122,7 +122,7 @@ namespace apitesthost.Controllers
 
         [HttpPost]
         [Route("CompleteProfile")]
-        public async Task<ActionResult<completereturnvalue>> CompleteProfile([FromForm] compteteprofilepost complete)
+        public async Task<ActionResult<completereturnvalue>> CompleteProfile([FromBody] compteteprofilepost complete)
         {
             var model = new complete_profile();
             var developermodel = new developer();
