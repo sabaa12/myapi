@@ -20,7 +20,8 @@ namespace apitesthost.Models
         public DbSet<developer> developer { get; set; }
         public DbSet<skkils> skkils { get; set; }
         public DbSet<employer_company> employer_company { get; set; }
- 
+        public DbSet<create_post> Create_Post { get; set; }
+        public DbSet<developer_skills> developer_Skills { get; set; }
 
     }
 }

@@ -15,7 +15,9 @@ namespace apitesthost.Models
     public class SignInreturnvalues
     {
         public string UserID { get; set; }
-        public string Status { get; set; }
+        public bool Status { get; set; }
+        public string role { get; set; }
+        public String email_address { get; set; }
     }
 
 }

@@ -33,6 +33,14 @@ namespace apitesthost.Controllers
         {
             var role = _context.users.Where(x => x.ID == id).FirstOrDefault().role;
 
+            if (role != 1)
+            {
+                var error = new errormodel();
+                error.error = "this user is not Developer";
+                return NotFound(error);
+
+            }
+
             if (!_context.users.Where(x => x.ID == id).FirstOrDefault().iscomplete)
             {
                 var error = new errormodel();
@@ -60,14 +68,22 @@ namespace apitesthost.Controllers
         }
 
         [HttpGet]
-        [Route("GeEmploertUsers/{id}")]
-        public async Task<ActionResult<emploergetmodel>> GeEmploertUsers(int id)
+        [Route("GetEmployerUsersPerson/{id}")]
+        public async Task<ActionResult<emploergetmodel>> Getemployerusers(int id)
         {
             var role = _context.users.Where(x => x.ID == id).FirstOrDefault().role;
+        
             if (role != 2)
             {
                 var error = new errormodel();
-                error.error = "this user is not emploer";
+                error.error = "this user is not employer";
+                return NotFound(error);
+
+            }
+            if (_context.complete_profile.Where(c => c.ID == id).FirstOrDefault() == null)
+            {
+                var error = new errormodel();
+                error.error = "this employer is not person";
                 return NotFound(error);
 
             }
@@ -86,11 +102,8 @@ namespace apitesthost.Controllers
             model.gender = compmodel.gender;
             model.age = compmodel.age;
             model.photo_url = compmodel.photo_url;
-            if (comanymodel != null)
-            {
-                model.company_logo = comanymodel.company_logo;
-                model.company_name = comanymodel.company_name;
-            }
+            model.role = "Employer";
+           
             
            
              
@@ -98,6 +111,33 @@ namespace apitesthost.Controllers
             return model;
         }
 
+        [HttpGet]
+        [Route("GetEmployerUsersCompany/{id}")]
+        public async Task<ActionResult<employer_company>> GetemployerusersCompany(int id)
+        {
+            var role = _context.users.Where(x => x.ID == id).FirstOrDefault().role;
+            if (role != 2)
+            {
+                var error = new errormodel();
+                error.error = "this user is not employer";
+                return NotFound(error);
+
+            }
+            if (_context.employer_company.Where(c => c.ID == id).FirstOrDefault() == null)
+            {
+                var error = new errormodel();
+                error.error = "this employer is not company";
+                return NotFound(error);
+
+            }
+            if (!_context.users.Where(x => x.ID == id).FirstOrDefault().iscomplete)
+            {
+                var error = new errormodel();
+                error.error = "profile is not completed";
+                return NotFound(error);
+            }
+            return _context.employer_company.Where(x => x.ID == id).FirstOrDefault();
+        }
 
         [HttpGet]
         [Route("isusercomplete/{id}")]
@@ -126,6 +166,7 @@ namespace apitesthost.Controllers
             suser.password = tools.hashpassword(user.password);
             if (user.role.ToLower() == "developer") suser.role = 1;
             else if(user.role.ToLower() == "employer") suser.role = 2;
+            suser.email_address = user.email_address;
             suser.iscomplete = false;
              
              _context.users.Add(suser);
@@ -134,7 +175,7 @@ namespace apitesthost.Controllers
             
             returnvalues.Registered = true;
             returnvalues.UserID = suser.ID.ToString();
-            returnvalues.Status = "user was created successfully";
+            returnvalues.Status =true;
           return returnvalues;
         }
 
@@ -148,17 +189,21 @@ namespace apitesthost.Controllers
             {
                 if (user.password == tools.hashpassword(password))
                 {
-                    ret.Status = "ok";
+                    ret.Status = true;
                     ret.UserID = user.ID.ToString();
+                    var roleid= _context.users.Where(x => x.email_address == email_address).FirstOrDefault().role;
+                    if (roleid == 1) ret.role = "Developer";
+                    else if (roleid == 2) ret.role = "Employer";
+                    ret.email_address = email_address;
                     return ret;
                 }
                 else
-                {
-                    ret.Status = "invalid password";
+                {   
+                    ret.Status = false;
                     return NotFound(ret);
                 }
             }
-            ret.Status = "invalid E-MAIL";
+            ret.Status = false;
 
             return NotFound(ret);
         }
@@ -218,7 +263,7 @@ namespace apitesthost.Controllers
 
 
         [HttpPost]
-        [Route("СompleteProfileEmployer")]
+        [Route("СompleteProfileEmployerPerson")]
         public async Task<ActionResult<completereturnvalue>> CompleteProfile_empleyers([FromForm] employersModel complete1)
         {
             var perosnmodel = new complete_profile();
@@ -229,6 +274,12 @@ namespace apitesthost.Controllers
                 return NotFound(error);
             }
             var userID = _context.users.Where(x => x.email_address == complete1.email_address).FirstOrDefault().ID;
+            if (_context.users.Where(x => x.ID == userID).FirstOrDefault().role != 2)
+            {
+                var error = new errormodel();
+                error.error = "this user is not Employer";
+                return NotFound(error);
+            }
        
             var companymodel = new employer_company();
 
@@ -239,20 +290,6 @@ namespace apitesthost.Controllers
             perosnmodel.gender = complete1.gender;
             perosnmodel.age = Int32.Parse(complete1.age);
            
-
-
-          
-            if(complete1.employer_type.ToLower() == "company")
-            {
-              
-                perosnmodel.user_name = null;
-                companymodel.ID = userID;
-                companymodel.company_name = complete1.company_name;
-                companymodel.company_logo = complete1.company_logo;
-
-                _context.employer_company.Add(companymodel);
-            
-            }
             _context.complete_profile.Add(perosnmodel);
 
             var ret = new completereturnvalue();
@@ -262,5 +299,118 @@ namespace apitesthost.Controllers
             return ret ;
         }
 
+
+        [HttpPost]
+        [Route("СompleteProfileEmployerCompany")]
+        public async Task<ActionResult<completereturnvalue>> CompleteProfileEmpleyersCompany([FromForm] comanyModel complete1)
+        {
+            var comanyodel = new employer_company();
+            if (_context.users.Where(x => x.email_address == complete1.email_address).FirstOrDefault() == null)
+            {
+                var error = new errormodel();
+                error.error = "user with this email doesnot exisit";
+                return NotFound(error);
+            }
+            var userID = _context.users.Where(x => x.email_address == complete1.email_address).FirstOrDefault().ID;
+            if (_context.users.Where(x => x.ID == userID).FirstOrDefault().role != 2)
+            {
+                var error = new errormodel();
+                error.error = "this user is not Employer";
+                return NotFound(error);
+            }
+
+            comanyodel.company_logo = complete1.company_logo;
+            comanyodel.company_name = complete1.company_name;
+            comanyodel.ID = userID;
+            _context.employer_company.Add(comanyodel);
+
+            try
+            {
+                await  _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                var error = new errormodel();
+                error.error = ex.Message;
+                return NotFound(error);
+
+            }
+            var ret = new completereturnvalue();
+            _context.users.Where(x => x.email_address == complete1.email_address).FirstOrDefault().iscomplete = true;
+            ret.profile_completed = true;
+            await _context.SaveChangesAsync();
+            return ret;
+        }
+         
+
+        [HttpPost]
+        [Route("CreatePost")]
+        public async Task<ActionResult<status>> CreatePost([FromForm] getjsnoasstring complete1)
+        {
+            var post = JsonConvert.DeserializeObject<CreatePostModel>(complete1.json);
+            var model =new  create_post();
+ 
+            model.create_date = post.create_date;
+            model.description = post.description;
+            model.ID = post.ID;
+            model.title = post.title;
+            model.experience_level = post.experience_level;
+            _context.Create_Post.Add(model);
+            foreach (var item in post.skills)
+            {
+                var skillsModel = new developer_skills();
+                skillsModel.employerID = post.ID;
+                skillsModel.skill = item;
+                _context.developer_Skills.Add(skillsModel);
+            }
+            try
+            {
+                await _context.SaveChangesAsync();
+
+            }
+            catch (Exception ex)
+            {
+                var error = new errormodel();
+                error.error = ex.Message;
+                return Unauthorized(error);
+            }
+
+            var ret = new status();
+            ret.statuss = "post created successfully";
+
+
+            return ret ;
+        }
+
+        [HttpGet]
+        [Route("GetPosts")]
+         public async Task<ActionResult<List<CreatePostModel>>> CreatePost()
+        {
+            
+            var list = _context.Create_Post.ToList();
+            
+            var retlist = new List<CreatePostModel>();
+            foreach (var item in list)
+            {
+                var list2 = new List<string>();
+                var postmodel = new CreatePostModel();
+                postmodel.create_date = item.create_date;
+                postmodel.description = item.description;
+                postmodel.experience_level = item.experience_level.Trim();
+                postmodel.ID = item.ID;
+                postmodel.title = item.title;
+                
+                foreach (var item2 in _context.developer_Skills.Where(x => x.employerID == item.ID).ToList())
+                {
+                   
+                    list2.Add(item2.skill.Trim());
+
+                }
+                postmodel.skills = list2;
+                retlist.Add(postmodel);
+            }
+
+            return retlist;
+        }
     }  
 }

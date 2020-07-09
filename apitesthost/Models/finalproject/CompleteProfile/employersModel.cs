@@ -7,9 +7,9 @@ namespace apitesthost.Models.finalproject.CompleteProfile
 {
     public class employersModel
     {
-        public string company_logo { get; set; }
-        public string company_name { get; set; }
-        public string employer_type { get; set; }
+      //  public string company_logo { get; set; }
+     //   public string company_name { get; set; }
+     
         public string user_name { get; set; }
         public string email_address { get; set; }
         public string gender { get; set; }
