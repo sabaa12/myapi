@@ -183,29 +183,43 @@ namespace apitesthost.Controllers
         [Route("SignIn")]
         public async Task<ActionResult<SignInreturnvalues>> SignIn([FromForm]string email_address,[FromForm]string password)
         {
+            var error = new errormodel();
             var ret = new SignInreturnvalues();
             var user = _context.users.Where(x => x.email_address == email_address).FirstOrDefault();
             if (user != null)
             {
+                
                 if (user.password == tools.hashpassword(password))
                 {
                     ret.Status = true;
                     ret.UserID = user.ID.ToString();
                     var roleid= _context.users.Where(x => x.email_address == email_address).FirstOrDefault().role;
                     if (roleid == 1) ret.role = "Developer";
-                    else if (roleid == 2) ret.role = "Employer";
+                    else if (roleid == 2)
+                    {
+                        ret.role = "Employer";
+                        var uid = _context.users.Where(x => x.email_address == email_address).FirstOrDefault().ID;
+                        if (_context.users.Where(x => x.email_address == email_address).FirstOrDefault().iscomplete)
+                        {
+                        if (_context.employer_company.Where(x => x.ID == uid).FirstOrDefault() != null) ret.employertype = "Company";
+                        else ret.employertype = "Person";
+
+                        }
+                       
+
+                    }
                     ret.email_address = email_address;
                     return ret;
                 }
                 else
-                {   
-                    ret.Status = false;
-                    return NotFound(ret);
+                {
+                   
+                    error.error = "password is incorrect";
+                    return NotFound(error);
                 }
             }
-            ret.Status = false;
-
-            return NotFound(ret);
+            error.error = "email is incorrect";
+            return NotFound(error);
         }
 
          

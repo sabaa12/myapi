@@ -17,6 +17,7 @@ namespace apitesthost.Models
         public string UserID { get; set; }
         public bool Status { get; set; }
         public string role { get; set; }
+        public string employertype { get; set; }
         public String email_address { get; set; }
     }
 
