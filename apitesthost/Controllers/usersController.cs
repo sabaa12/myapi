@@ -376,21 +376,22 @@ namespace apitesthost.Controllers
                 skillsModel.employerID = post.ID;
                 skillsModel.skill = item;
                 _context.developer_Skills.Add(skillsModel);
-            }
-            try
-            {
-                await _context.SaveChangesAsync();
+            } 
+            await _context.SaveChangesAsync();
+            //try
+            //{
+               
 
-            }
-            catch (Exception ex)
-            {
-                var error = new errormodel();
-                error.error = ex.Message;
-                return Unauthorized(error);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    var error = new errormodel();
+            //    error.error = ex.Message;
+            //    return Unauthorized(error);
+            //}
 
             var ret = new status();
-            ret.statuss = "post created successfully";
+            ret.ispostcreated =true;
 
 
             return ret ;

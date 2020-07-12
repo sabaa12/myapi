@@ -7,6 +7,6 @@ namespace apitesthost.Models.finalproject.CompleteProfile
 {
     public class status
     {
-        public string statuss { get; set; }
+        public Boolean ispostcreated { get; set; }
     }
 }
