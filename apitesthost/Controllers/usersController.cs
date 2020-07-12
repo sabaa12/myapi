@@ -377,10 +377,10 @@ namespace apitesthost.Controllers
                 skillsModel.skill = item;
                 _context.developer_Skills.Add(skillsModel);
             } 
-        
+          await _context.SaveChangesAsync();
             try
             {
-                await _context.SaveChangesAsync();
+              
             }
             catch (Exception ex)
             {
@@ -427,5 +427,44 @@ namespace apitesthost.Controllers
 
             return retlist;
         }
+
+        [HttpGet]
+        [Route("GetDevelopers")]
+        public async Task<ActionResult<List<compteteprofilepost>>> GetDevelopers()
+        {
+            var list = _context.users.Where(x => x.role == 1).ToList();
+            var returnlist = new List<compteteprofilepost>();
+            foreach (var item in list)
+            {
+                var uid = item.ID;
+                var model = new compteteprofilepost();
+                if (item.iscomplete)
+                {
+                    var comleteProfieModel = _context.complete_profile.Where(x => x.ID == uid).FirstOrDefault();
+                    model.email_address = item.email_address;
+                    model.user_name = comleteProfieModel.user_name;
+                    model.gender = comleteProfieModel.gender;
+                    model.age = comleteProfieModel.age.ToString();
+                    model.photo_url = comleteProfieModel.photo_url;
+                    model.position= _context.developer.Where(x => x.ID == uid).FirstOrDefault().position;
+                    model.role = "Developer";
+
+                    var skills = _context.skkils.Where(x => x.developerID == uid).ToList();
+                    var skilllist = new List<string>();
+                    foreach (var item2 in skills)
+                    {
+                        skilllist.Add(item2.skill.Trim());
+                    }
+                    model.skills = skilllist;
+
+                    returnlist.Add(model);
+                }
+
+            }
+              
+
+            return returnlist;
+        }
+
     }  
 }
