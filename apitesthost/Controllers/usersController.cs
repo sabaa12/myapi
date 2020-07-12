@@ -377,18 +377,17 @@ namespace apitesthost.Controllers
                 skillsModel.skill = item;
                 _context.developer_Skills.Add(skillsModel);
             } 
-            await _context.SaveChangesAsync();
-            //try
-            //{
-               
-
-            //}
-            //catch (Exception ex)
-            //{
-            //    var error = new errormodel();
-            //    error.error = ex.Message;
-            //    return Unauthorized(error);
-            //}
+        
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                var error = new errormodel();
+                error.error = ex.Message;
+                return Unauthorized(error);
+            }
 
             var ret = new status();
             ret.ispostcreated =true;
@@ -414,6 +413,7 @@ namespace apitesthost.Controllers
                 postmodel.experience_level = item.experience_level.Trim();
                 postmodel.ID = item.ID;
                 postmodel.title = item.title;
+                postmodel.email_address = _context.users.Where(x => x.ID == item.ID).FirstOrDefault().email_address;
                 
                 foreach (var item2 in _context.developer_Skills.Where(x => x.employerID == item.ID).ToList())
                 {
