@@ -366,15 +366,18 @@ namespace apitesthost.Controllers
  
             model.create_date = post.create_date;
             model.description = post.description;
-            model.ID = post.ID;
+            model.EmployerID = post.ID;
             model.title = post.title;
             model.experience_level = post.experience_level;
             _context.Create_Post.Add(model);
+            await _context.SaveChangesAsync();
+            var postId = model.ID;
             foreach (var item in post.skills)
             {
                 var skillsModel = new developer_skills();
                 skillsModel.employerID = post.ID;
                 skillsModel.skill = item;
+                skillsModel.PostID = postId;
                 _context.developer_Skills.Add(skillsModel);
             } 
           await _context.SaveChangesAsync();
@@ -398,7 +401,7 @@ namespace apitesthost.Controllers
 
         [HttpGet]
         [Route("GetPosts")]
-         public async Task<ActionResult<List<CreatePostModel>>> CreatePost()
+         public async Task<ActionResult<List<CreatePostModel>>> GetPosts()
         {
             
             var list = _context.Create_Post.ToList();
@@ -411,11 +414,11 @@ namespace apitesthost.Controllers
                 postmodel.create_date = item.create_date;
                 postmodel.description = item.description;
                 postmodel.experience_level = item.experience_level.Trim();
-                postmodel.ID = item.ID;
+                postmodel.ID = item.EmployerID;
                 postmodel.title = item.title;
-                postmodel.email_address = _context.users.Where(x => x.ID == item.ID).FirstOrDefault().email_address;
-                
-                foreach (var item2 in _context.developer_Skills.Where(x => x.employerID == item.ID).ToList())
+                postmodel.email_address = _context.users.Where(x => x.ID == item.EmployerID).FirstOrDefault().email_address;
+
+                 foreach (var item2 in _context.developer_Skills.Where(x => x.PostID == item.ID).ToList())
                 {
                    
                     list2.Add(item2.skill.Trim());
