@@ -7,6 +7,7 @@ namespace apitesthost.Models.finalproject.CompleteProfile
 {
     public class compteteprofilepost
     {
+        public int ID { get; set; }
         public string user_name { get; set; }
         public string email_address { get; set; }
         public string age { get; set; }

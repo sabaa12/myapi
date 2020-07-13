@@ -469,7 +469,7 @@ namespace apitesthost.Controllers
                     model.photo_url = comleteProfieModel.photo_url;
                     model.position= _context.developer.Where(x => x.ID == uid).FirstOrDefault().position;
                     model.role = "Developer";
-
+                    model.ID = uid;
                     var skills = _context.skkils.Where(x => x.developerID == uid).ToList();
                     var skilllist = new List<string>();
                     foreach (var item2 in skills)
