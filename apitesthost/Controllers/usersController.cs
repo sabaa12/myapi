@@ -417,7 +417,10 @@ namespace apitesthost.Controllers
                 postmodel.ID = item.EmployerID;
                 postmodel.title = item.title;
                 postmodel.email_address = _context.users.Where(x => x.ID == item.EmployerID).FirstOrDefault().email_address;
-
+                if (_context.employer_company.Where(x => x.ID == item.EmployerID).FirstOrDefault() != null)
+                    postmodel.photo_url = _context.employer_company.Where(x => x.ID == item.EmployerID).FirstOrDefault().company_logo;
+                else 
+                postmodel.photo_url = _context.complete_profile.Where(c => c.ID == item.EmployerID).FirstOrDefault().photo_url;
                  foreach (var item2 in _context.developer_Skills.Where(x => x.PostID == item.ID).ToList())
                 {
                    

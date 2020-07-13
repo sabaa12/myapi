@@ -14,5 +14,6 @@ namespace apitesthost.Models.finalproject.CompleteProfile
         public string experience_level { get; set; }
         public string email_address { get; set; }
         public List<string> skills { get; set; }
+        public string photo_url { get; set; }
     }
 }
