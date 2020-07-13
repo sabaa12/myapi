@@ -191,21 +191,36 @@ namespace apitesthost.Controllers
                 
                 if (user.password == tools.hashpassword(password))
                 {
+                    var uid = _context.users.Where(x => x.email_address == email_address).FirstOrDefault().ID;
+
                     ret.Status = true;
                     ret.UserID = user.ID.ToString();
                     var roleid= _context.users.Where(x => x.email_address == email_address).FirstOrDefault().role;
-                    if (roleid == 1) ret.role = "Developer";
+                    if (roleid == 1)
+                    {
+                        ret.role = "Developer";
+                        ret.Photo_url = _context.complete_profile.Where(x => x.ID == uid).FirstOrDefault().photo_url;
+                    }
+
                     else if (roleid == 2)
                     {
                         ret.role = "Employer";
-                        var uid = _context.users.Where(x => x.email_address == email_address).FirstOrDefault().ID;
+                        
                         if (_context.users.Where(x => x.email_address == email_address).FirstOrDefault().iscomplete)
                         {
-                        if (_context.employer_company.Where(x => x.ID == uid).FirstOrDefault() != null) ret.employertype = "Company";
-                        else ret.employertype = "Person";
+                            if (_context.employer_company.Where(x => x.ID == uid).FirstOrDefault() != null)
+                            {
+                                ret.employertype = "Company";
+                                ret.Photo_url = _context.employer_company.Where(x => x.ID == uid).FirstOrDefault().company_logo;
+                            }
+                            else
+                            {
+                                ret.Photo_url = _context.complete_profile.Where(x => x.ID == uid).FirstOrDefault().photo_url;
+                                ret.employertype = "Person";
+                            }
 
                         }
-                       
+
 
                     }
                     ret.email_address = email_address;
