@@ -1,4 +1,5 @@
-﻿using apitesthost.Models.finalproject.CompleteProfile;
+﻿using apitesthost.Models.finalproject;
+using apitesthost.Models.finalproject.CompleteProfile;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace apitesthost.Models
         public DbSet<employer_company> employer_company { get; set; }
         public DbSet<create_post> Create_Post { get; set; }
         public DbSet<developer_skills> developer_Skills { get; set; }
-
+        public DbSet<favorites> favorites { get; set; }
+        public DbSet<favorite_posts> favorite_Posts { get; set; }
     }
 }

@@ -8,6 +8,7 @@ namespace apitesthost.Models.finalproject.CompleteProfile
     public class CreatePostModel
     {
         public int ID { get; set; }
+        public int postID { get; set; }
         public string title { get; set; }
         public string description { get; set; }
         public string create_date { get; set; }

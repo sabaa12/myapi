@@ -53,6 +53,7 @@ namespace apitesthost.Controllers
             model.user_name = compmodel.user_name;
             model.email_address = compmodel.email_address;
             model.gender = compmodel.gender;
+            model.ID = id;
             model.age  = compmodel.age.ToString();
             model.position = _context.developer.Where(x => x.ID == id).FirstOrDefault().position;
             model.photo_url = compmodel.photo_url;
@@ -395,10 +396,10 @@ namespace apitesthost.Controllers
                 skillsModel.PostID = postId;
                 _context.developer_Skills.Add(skillsModel);
             } 
-          await _context.SaveChangesAsync();
+        
             try
             {
-              
+                await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -431,6 +432,7 @@ namespace apitesthost.Controllers
                 postmodel.experience_level = item.experience_level.Trim();
                 postmodel.ID = item.EmployerID;
                 postmodel.title = item.title;
+                postmodel.postID = item.ID;
                 postmodel.email_address = _context.users.Where(x => x.ID == item.EmployerID).FirstOrDefault().email_address;
                 if (_context.employer_company.Where(x => x.ID == item.EmployerID).FirstOrDefault() != null)
                     postmodel.photo_url = _context.employer_company.Where(x => x.ID == item.EmployerID).FirstOrDefault().company_logo;
@@ -485,6 +487,143 @@ namespace apitesthost.Controllers
               
 
             return returnlist;
+        }
+
+
+        [HttpPost]
+        [Route("addDeveloperToFavorites")]
+        public async Task<ActionResult<status>> addToFavorites([FromForm]favoritesModel model)
+        {
+            var datamodel = new favorites();
+            datamodel.user_id = model.user_id;
+            datamodel.favorited_user_id = model.favorited_user_id;
+            _context.favorites.Add(datamodel);
+            await _context.SaveChangesAsync();
+
+            var ret = new status();
+            ret.ispostcreated = true;
+
+            return ret;
+        }
+        [HttpGet]
+        [Route("GetFavoriteDevelopers/{uid}")]
+        public async Task<ActionResult<List<compteteprofilepost>>> Getfavorites(int uid)
+        {
+            var listt = _context.favorites.Where(x => x.user_id == uid).ToList();
+            var returnlist = new List<compteteprofilepost>();
+            var id = 0;
+            foreach (var item in listt)
+            {
+                id = item.favorited_user_id;
+
+                var model = new compteteprofilepost();
+                var compmodel = _context.complete_profile.Where(x => x.ID == id).FirstOrDefault();
+                model.user_name = compmodel.user_name;
+                model.email_address = compmodel.email_address;
+                model.gender = compmodel.gender;
+                model.age = compmodel.age.ToString();
+                model.ID = id;
+                model.position = _context.developer.Where(x => x.ID == id).FirstOrDefault().position;
+                model.photo_url = compmodel.photo_url;
+                var skills = _context.skkils.Where(x => x.developerID == id).ToList();
+                var list = new List<string>();
+                foreach (var item2 in skills)
+                {
+                    list.Add(item2.skill.Trim());
+                }
+                model.skills = list;
+                returnlist.Add(model);
+            }
+
+
+            return returnlist;
+        }
+
+
+        [HttpPost]
+        [Route("addPostToFavorites")]
+        public async Task<ActionResult<status>> addPostToFavorites([FromForm] favoritesModel model)
+        {
+            var datamodel = new favorite_posts();
+            datamodel.developer_id = model.user_id;
+            datamodel.post_id = model.favorited_user_id;
+            _context.favorite_Posts.Add(datamodel);
+            await _context.SaveChangesAsync();
+
+            var ret = new status();
+            ret.ispostcreated = true;
+
+            return ret;
+
+        }
+
+        [HttpGet]
+        [Route("GetFavoritePosts/{uid}")]
+        public async Task<ActionResult<List<CreatePostModel>>> GetFavoritePosts(int uid)
+        {
+            var listt = _context.favorite_Posts.Where(x => x.developer_id == uid).ToList();
+            var retlist = new List<CreatePostModel>();
+
+            foreach (var item1 in listt)
+            {
+                var list = _context.Create_Post.Where(x => x.ID == item1.post_id).ToList();
+                foreach (var item in list)
+                {
+                    var list2 = new List<string>();
+                    var postmodel = new CreatePostModel();
+                    postmodel.create_date = item.create_date;
+                    postmodel.description = item.description;
+                    postmodel.experience_level = item.experience_level.Trim();
+                    postmodel.ID = item.EmployerID;
+                    postmodel.title = item.title;
+                    postmodel.postID = item.ID;
+                    postmodel.email_address = _context.users.Where(x => x.ID == item.EmployerID).FirstOrDefault().email_address;
+                    if (_context.employer_company.Where(x => x.ID == item.EmployerID).FirstOrDefault() != null)
+                        postmodel.photo_url = _context.employer_company.Where(x => x.ID == item.EmployerID).FirstOrDefault().company_logo;
+                    else
+                        postmodel.photo_url = _context.complete_profile.Where(c => c.ID == item.EmployerID).FirstOrDefault().photo_url;
+                    foreach (var item2 in _context.developer_Skills.Where(x => x.PostID == item.ID).ToList())
+                    {
+
+                        list2.Add(item2.skill.Trim());
+
+                    }
+                    postmodel.skills = list2;
+                    retlist.Add(postmodel);
+                }
+            }
+
+            return retlist;
+        }
+
+        [HttpPost]
+        [Route("RemoveDeveloperFromFavorites")]
+        public async Task<ActionResult<status>> RemoveDeveloperFromFavorites([FromForm] favoritesModel model)
+        {
+            var delmodel = _context.favorites.Where(c => c.user_id == model.user_id).Where(x => x.favorited_user_id == model.favorited_user_id).FirstOrDefault();
+
+            _context.favorites.Remove(delmodel);
+            await _context.SaveChangesAsync();
+
+            var ret = new status();
+            ret.ispostcreated = true;
+
+            return ret;
+        }
+
+        [HttpPost]
+        [Route("RemovePostFromFavorites")]
+        public async Task<ActionResult<status>> RemovePostFromFavorites([FromForm] favoritesModel model)
+        {
+            var delmodel = _context.favorite_Posts.Where(c => c.developer_id == model.user_id).Where(x => x.post_id == model.favorited_user_id).FirstOrDefault();
+
+            _context.favorite_Posts.Remove(delmodel);
+            await _context.SaveChangesAsync();
+
+            var ret = new status();
+            ret.ispostcreated = true;
+
+            return ret;
         }
 
     }  
