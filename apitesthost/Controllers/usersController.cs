@@ -650,7 +650,7 @@ namespace apitesthost.Controllers
 
         [HttpPost]
         [Route("GetUsernameandPhotoUrl")]
-        public async Task<ActionResult<USernamewithPhotoModel>> GetUsernameandPhotoUrl(ReceiverSenderModel model)
+        public async Task<ActionResult<USernamewithPhotoModel>> GetUsernameandPhotoUrl([FromForm]ReceiverSenderModel model)
         {
             var retmodel = new USernamewithPhotoModel();
             retmodel.senderPhotoUrl = _context.complete_profile.Where(x => x.ID == model.senderID).FirstOrDefault().photo_url;
