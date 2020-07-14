@@ -419,7 +419,6 @@ namespace apitesthost.Controllers
         [Route("GetPosts")]
          public async Task<ActionResult<List<CreatePostModel>>> GetPosts()
         {
-            
             var list = _context.Create_Post.ToList();
             
             var retlist = new List<CreatePostModel>();
@@ -649,6 +648,17 @@ namespace apitesthost.Controllers
             return retmodel;
         }
 
+        [HttpPost]
+        [Route("GetUsernameandPhotoUrl")]
+        public async Task<ActionResult<USernamewithPhotoModel>> GetUsernameandPhotoUrl(ReceiverSenderModel model)
+        {
+            var retmodel = new USernamewithPhotoModel();
+            retmodel.senderPhotoUrl = _context.complete_profile.Where(x => x.ID == model.senderID).FirstOrDefault().photo_url;
+            retmodel.receiverUSername = _context.complete_profile.Where(x => x.ID == model.receiverID).FirstOrDefault().user_name;
+            retmodel.receiverPhotoUrl = _context.complete_profile.Where(x => x.ID == model.receiverID).FirstOrDefault().photo_url;
+
+            return retmodel;
+        }
 
     }
 }
