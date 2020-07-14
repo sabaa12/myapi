@@ -505,6 +505,7 @@ namespace apitesthost.Controllers
 
             return ret;
         }
+
         [HttpGet]
         [Route("GetFavoriteDevelopers/{uid}")]
         public async Task<ActionResult<List<compteteprofilepost>>> Getfavorites(int uid)
@@ -626,5 +627,28 @@ namespace apitesthost.Controllers
             return ret;
         }
 
-    }  
+        [HttpPost]
+        [Route("checkDeveloper")]
+        public async Task<ActionResult<Isfav>> checkDeveloper([FromForm] favoritesModel model)
+        {
+            var retmodel = new Isfav();
+            var delmodel = _context.favorites.Where(c => c.user_id == model.user_id).Where(x => x.favorited_user_id == model.favorited_user_id).FirstOrDefault();
+            if (delmodel == null) retmodel.ISFavorite = false;
+            else retmodel.ISFavorite =true;
+            return retmodel;
+        }
+
+        [HttpPost]
+        [Route("chechPost")]
+        public async Task<ActionResult<Isfav>> chechPost([FromForm] favoritesModel model)
+        {
+            var retmodel = new Isfav();
+            var delmodel = _context.favorite_Posts.Where(c => c.developer_id == model.user_id).Where(x => x.post_id == model.favorited_user_id).FirstOrDefault();
+            if (delmodel == null) retmodel.ISFavorite = false;
+            else retmodel.ISFavorite = true;
+            return retmodel;
+        }
+
+
+    }
 }
