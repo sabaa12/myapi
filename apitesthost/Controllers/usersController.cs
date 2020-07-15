@@ -653,9 +653,29 @@ namespace apitesthost.Controllers
         public async Task<ActionResult<USernamewithPhotoModel>> GetUsernameandPhotoUrl([FromForm]ReceiverSenderModel model)
         {
             var retmodel = new USernamewithPhotoModel();
-            retmodel.senderPhotoUrl = _context.complete_profile.Where(x => x.ID == model.senderID).FirstOrDefault().photo_url;
-            retmodel.receiverUSername = _context.complete_profile.Where(x => x.ID == model.receiverID).FirstOrDefault().user_name;
-            retmodel.receiverPhotoUrl = _context.complete_profile.Where(x => x.ID == model.receiverID).FirstOrDefault().photo_url;
+
+            if (_context.employer_company.Where(c => c.ID == model.receiverID).FirstOrDefault() != null)
+            {
+                retmodel.receiverUSername = _context.employer_company.Where(x => x.ID == model.receiverID).FirstOrDefault().company_name;
+                retmodel.receiverPhotoUrl = _context.employer_company.Where(x => x.ID == model.receiverID).FirstOrDefault().company_logo;
+                retmodel.senderPhotoUrl = _context.complete_profile.Where(x => x.ID == model.senderID).FirstOrDefault().photo_url;
+            }
+            else if(_context.employer_company.Where(c => c.ID == model.senderID).FirstOrDefault() != null)
+            {   
+                retmodel.senderPhotoUrl = _context.employer_company.Where(x => x.ID == model.senderID).FirstOrDefault().company_logo;
+
+                retmodel.receiverPhotoUrl = _context.complete_profile.Where(x => x.ID == model.receiverID).FirstOrDefault().photo_url;
+                retmodel.receiverUSername = _context.complete_profile.Where(x => x.ID == model.receiverID).FirstOrDefault().user_name;
+            }
+            
+            else  
+            {
+                retmodel.receiverPhotoUrl = _context.complete_profile.Where(x => x.ID == model.senderID).FirstOrDefault().photo_url;
+                retmodel.senderPhotoUrl = _context.complete_profile.Where(x => x.ID == model.senderID).FirstOrDefault().photo_url;
+                retmodel.receiverUSername = _context.complete_profile.Where(x => x.ID == model.receiverID).FirstOrDefault().user_name;
+
+            }
+           
 
             return retmodel;
         }
