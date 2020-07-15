@@ -670,7 +670,7 @@ namespace apitesthost.Controllers
             
             else  
             {
-                retmodel.receiverPhotoUrl = _context.complete_profile.Where(x => x.ID == model.senderID).FirstOrDefault().photo_url;
+                retmodel.receiverPhotoUrl = _context.complete_profile.Where(x => x.ID == model.receiverID).FirstOrDefault().photo_url;
                 retmodel.senderPhotoUrl = _context.complete_profile.Where(x => x.ID == model.senderID).FirstOrDefault().photo_url;
                 retmodel.receiverUSername = _context.complete_profile.Where(x => x.ID == model.receiverID).FirstOrDefault().user_name;
 
